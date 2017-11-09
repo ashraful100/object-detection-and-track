@@ -7,6 +7,7 @@
 #include <QSqlQuery>
 #include <QSqlDatabase>
 #include <featuredata.h>
+#include <display_image.h>
 
 using namespace cv;
 
@@ -22,10 +23,11 @@ public:
     Mat object;
     explicit MainWindow(QWidget *parent = 0);   
     QSqlDatabase Database;
+    Display_Image disp;
     QSqlQuery *query;
     int frameNum;int CurrentFrame;
     VideoCapture cap;
-    Mat3b frame1,frame3;
+    Mat3b frame1,frame3, result_image;
     QImage image1, image2;
     FeatureData featureData;
 

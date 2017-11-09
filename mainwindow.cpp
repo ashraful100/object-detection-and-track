@@ -277,11 +277,15 @@ void MainWindow::FAST_corner_detection()
         vector<DMatch> matches;
         matcher.match(descriptors_object, descriptors_scene, matches);
 
-        namedWindow("Resulting_Img", CV_WINDOW_FREERATIO);
-        Mat img_matches;
-        drawMatches(GrayImage_1, keypoints1, GrayImage_2, keypoints2, matches, img_matches);
-        imshow("Resulting_Img", img_matches);
-        waitKey(0);
+
+        Mat3b img_matches;
+        drawMatches(inputImg_1, keypoints1, inputImg_2, keypoints2, matches, img_matches);
+
+        QImage pass=Mat3b2QImage(img_matches);
+        disp.DisplayQImage(pass);
+        disp.setModal(true);
+        disp.exec();
+
     }
     else
     {
@@ -358,11 +362,14 @@ void MainWindow::SIFT_feature_detection()
         // Draw the results. Displays the images side by side, with colored circles at
         // each keypoint, and lines connecting the matching keypoints between the two
         // images.
-        namedWindow("Resulting_Img", CV_WINDOW_FREERATIO);
-        Mat img_matches;
-        drawMatches(inputImg, inputImgKeypoints, outputImg, outputImgKeypoints, matches, img_matches);        
-        imshow("Resulting_Img", img_matches);
-        waitKey(0);
+
+        Mat3b img_matches;
+        drawMatches(object, inputImgKeypoints, frame3, outputImgKeypoints, matches, img_matches);
+
+        QImage pass=Mat3b2QImage(img_matches);
+        disp.DisplayQImage(pass);
+        disp.setModal(true);
+        disp.exec();
     }
     else
     {
@@ -427,8 +434,8 @@ void MainWindow::SURF_feature_detection()
         { good_matches.push_back( matches[i]); }
     }
 
-    Mat img_matches;
-    drawMatches( img_object, keypoints_object, img_scene, keypoints_scene,
+    Mat3b img_matches;
+    drawMatches(object, keypoints_object, frame3, keypoints_scene,
                  good_matches, img_matches, Scalar::all(-1), Scalar::all(-1),
                  vector<char>(), DrawMatchesFlags::NOT_DRAW_SINGLE_POINTS );
 
@@ -461,9 +468,11 @@ void MainWindow::SURF_feature_detection()
     line( img_matches, scene_corners[3] + Point2f( img_object.cols, 0), scene_corners[0] + Point2f( img_object.cols, 0), Scalar( 0, 255, 0), 4 );
 
     //-- Show detected matches
-    namedWindow("Good Matches & Object detection", CV_WINDOW_FREERATIO);
-    imshow( "Good Matches & Object detection", img_matches );
-    waitKey(0);
+    QImage pass=Mat3b2QImage(img_matches);
+    disp.DisplayQImage(pass);
+    disp.setModal(true);
+    disp.exec();
+
 }
 
 void MainWindow::BRIEF_feature_detection()
@@ -493,7 +502,6 @@ void MainWindow::BRIEF_feature_detection()
     {
         grayImg_2=img_2;
     }
-    cout<<"Stage 2: rgb to grayscale image conversion is done"<<endl;
     vector<KeyPoint>keypoints_1, keypoints_2;
 
     FastFeatureDetector detector;
@@ -509,16 +517,17 @@ void MainWindow::BRIEF_feature_detection()
 
     size = img2_descriptor.size();
 
-    //BruteForceMatcher<L2<float> >matcher;
     BFMatcher matcher(NORM_L2);
     vector<DMatch> matches;
     matcher.match(img1_descriptor, img2_descriptor, matches);
 
-    namedWindow("Resulting_Img", CV_WINDOW_FREERATIO);
-    Mat img_matches;
-    drawMatches(grayImg_1, keypoints_1, grayImg_2, keypoints_2, matches, img_matches);
-    imshow("Resulting_Img", img_matches);
-    waitKey(0);
+    Mat3b img_matches;
+    drawMatches(img_1, keypoints_1, img_2, keypoints_2, matches, img_matches);
+
+    QImage pass=Mat3b2QImage(img_matches);
+    disp.DisplayQImage(pass);
+    disp.setModal(true);
+    disp.exec();
 }
 
 void MainWindow::ORB_feature_detection()
@@ -568,16 +577,17 @@ void MainWindow::ORB_feature_detection()
         extractor.compute(grayImg_2, keypoints_2, img2_descriptor);
     }
 
-    //BruteForceMatcher<L2<float> >matcher;
     BFMatcher matcher(NORM_L2);
     vector<DMatch> matches;
     matcher.match(img1_descriptor, img2_descriptor, matches);
 
-    namedWindow("Resulting_Img", CV_WINDOW_FREERATIO);
-    Mat img_matches;
-    drawMatches(grayImg_1, keypoints_1, grayImg_2, keypoints_2, matches, img_matches);
-    imshow("Resulting_Img", img_matches);
-    waitKey(0);
+    Mat3b img_matches;
+    drawMatches(img_1, keypoints_1, img_2, keypoints_2, matches, img_matches);
+
+    QImage pass=Mat3b2QImage(img_matches);
+    disp.DisplayQImage(pass);
+    disp.setModal(true);
+    disp.exec();
 }
 
 void MainWindow::DisplayDetectedObj()
@@ -768,5 +778,4 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_Quit_clicked()
 {
     exit(EXIT_FAILURE);
-
 }

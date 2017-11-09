@@ -30,21 +30,24 @@ SOURCES += main.cpp\
     detectordatabase.cpp \
     contents.cpp \
     about.cpp \
-    featuredata.cpp
+    featuredata.cpp \
+    display_image.cpp
 
 HEADERS  += mainwindow.h \
     mouse_position.h \
     detectordatabase.h \
     contents.h \
     about.h \
-    featuredata.h
+    featuredata.h \
+    display_image.h
 
 FORMS    += mainwindow.ui \
     objectdialog.ui \
     detectordatabase.ui \
     contents.ui \
     about.ui \
-    featuredata.ui
+    featuredata.ui \
+    display_image.ui
 
 RESOURCES +=
 
