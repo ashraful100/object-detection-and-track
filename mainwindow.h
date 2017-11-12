@@ -9,6 +9,11 @@
 #include <featuredata.h>
 #include <display_image.h>
 
+#include <QPixmap>
+#include <QPainter>
+
+#include <QPoint>
+
 using namespace cv;
 
 namespace Ui {
@@ -30,6 +35,8 @@ public:
     Mat3b frame1,frame3, result_image;
     QImage image1, image2;
     FeatureData featureData;
+    QPixmap scaled;
+    QImage dest;
 
     void FAST_corner_detection();
     void SIFT_feature_detection();
@@ -84,10 +91,19 @@ private slots:
 
     void on_Quit_clicked();
 
+    void on_EnableCropObject_clicked();
+
 private:
     Ui::MainWindow *ui;
 
 public slots:
+    void slotMouseSingleClicked(QMouseEvent *mouseEvent);
+    void slotMouseDoubleClicked(QMouseEvent *mouseEvent);
+    //void slotMouseReleased(QMouseEvent *mouseEvent);
+    //void slotMouseMoved(QMouseEvent *mouseEvent);
+    void slotMouseMovedWithRightClickDown(QRect rectangle);
+    void slotNewRectangleReceived(QRect rectangle);
+
     void showMousePosition(QPoint& pos);
 signals:
     void sendCurrentFrame(int);
