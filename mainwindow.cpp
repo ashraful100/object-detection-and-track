@@ -866,6 +866,7 @@ void MainWindow::on_EnableCropObject_clicked()
     connect(ui->detection_img,SIGNAL(signalMouseMovedWithRightClickDown(QRect)),this,SLOT(slotMouseMovedWithRightClickDown(QRect)));
     connect(ui->detection_img,SIGNAL(signalNewRectangle(QRect)),this,SLOT(slotNewRectangleReceived(QRect)));
 
+    //Now disconnecting other signals
     disconnect(ui->detection_img,SIGNAL(signalMouseClicked(QMouseEvent*)),this,SLOT(slotMouseSingleClicked(QMouseEvent*)));
     disconnect(ui->detection_img,SIGNAL(signalMouseDoubleClicked(QMouseEvent*)),this,SLOT(slotMouseDoubleClicked(QMouseEvent*)));
 

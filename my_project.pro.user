@@ -1,10 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE QtCreatorProject>
-<<<<<<< HEAD
-<!-- Written by QtCreator 4.2.1, 2017-11-12T21:51:19. -->
-=======
-<!-- Written by QtCreator 4.2.1, 2017-11-12T21:11:22. -->
->>>>>>> 4297542af488856c34f73ba0a3f1c0338014aeba
+<!-- Written by QtCreator 4.2.1, 2017-11-12T22:25:11. -->
 <qtcreator>
  <data>
   <variable>EnvironmentId</variable>
@@ -290,11 +286,7 @@
     <valuelist type="QVariantList" key="PE.EnvironmentAspect.Changes"/>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DefaultDisplayName">my_project</value>
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.DisplayName"></value>
-<<<<<<< HEAD
     <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/ASHRAF/Documents/my_project/my_project.pro</value>
-=======
-    <value type="QString" key="ProjectExplorer.ProjectConfiguration.Id">Qt4ProjectManager.Qt4RunConfiguration:C:/Users/ASHRAF/Desktop/my_project/my_project.pro</value>
->>>>>>> 4297542af488856c34f73ba0a3f1c0338014aeba
     <value type="bool" key="QmakeProjectManager.QmakeRunConfiguration.UseLibrarySearchPath">true</value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.CommandLineArguments"></value>
     <value type="QString" key="Qt4ProjectManager.Qt4RunConfiguration.ProFile">my_project.pro</value>

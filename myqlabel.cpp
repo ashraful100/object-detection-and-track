@@ -77,7 +77,8 @@ void MyQLabel::mouseMoveEvent(QMouseEvent *mouseEvent)
         emit signalMouseMovedWithRightClickDown(rightClickRectangleMoved);
     }
 
-    // Emit the signal of mouse movement (independent of mouse keys):
+    // Emit the signal of mouse movement (independent of mouse keys)...:
     emit signalMouseMoved(mouseEvent);
+
 }
 
