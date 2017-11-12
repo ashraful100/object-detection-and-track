@@ -12,6 +12,7 @@ DetectorDatabase::DetectorDatabase(QWidget *parent) :
     ui(new Ui::DetectorDatabase)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Detector Database List");
 
     mDatabase = QSqlDatabase::addDatabase("QSQLITE");
     mDatabase.setDatabaseName("C:/sqlite2/DetectorList.db");

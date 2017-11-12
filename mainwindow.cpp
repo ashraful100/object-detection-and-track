@@ -26,10 +26,9 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->setWindowTitle("My Project");
-    //this->setFixedSize(QSize(570, 300));
-    //this->setWindowState(Qt::WindowFullScreen);
+    this->setWindowTitle("Object Detection and Tracking");
     QPixmap pix("C:/Users/ASHRAF/Desktop/X-folder/headingLogo2.png");
+    //scaled=image.scaled(ui->detection_img->width(),ui->detection_img->height());
     ui->detection_img->setPixmap(pix);
     ui->detection_img->setScaledContents(true);
     ui->detection_img->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
@@ -196,13 +195,20 @@ void MainWindow::Classifier_Apply()
         }
 
         Mat3b src = frame;
-        QImage dest=Mat3b2QImage(src);
+        dest=Mat3b2QImage(src);
+        //QPixmap imge=QPixmap::fromImage(dest);
+
         ui->detection_img->setPixmap(QPixmap::fromImage(dest));
         ui->detection_img->setScaledContents(true);
         ui->detection_img->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
 
         QPoint point;
-        connect(ui->detection_img,SIGNAL(sendMousePosition(QPoint&)),this,SLOT(showMousePosition(QPoint&)));
+        //connect(ui->detection_img,SIGNAL(sendMousePosition(QPoint&)),this,SLOT(showMousePosition(QPoint&)));
+
+        connect(ui->detection_img,SIGNAL(signalMouseClicked(QMouseEvent*)),this,SLOT(slotMouseSingleClicked(QMouseEvent*)));
+        connect(ui->detection_img,SIGNAL(signalMouseDoubleClicked(QMouseEvent*)),this,SLOT(slotMouseDoubleClicked(QMouseEvent*)));
+
+
         imwrite("object_detected_image.jpg",frame);
     }
 }
@@ -593,12 +599,10 @@ void MainWindow::ORB_feature_detection()
 void MainWindow::DisplayDetectedObj()
 {
     Point2f point3(point2.x(),point2.y());
-    float a,b,c,d,e,f,x,y;
-    a=point3.x; b=480; c=frame.cols;
-    d=point3.y; e=320; f=frame.rows;
+    int x,y;
 
-    x =static_cast<int>(a/b*c);
-    y =static_cast<int>(d/e*f);
+    x =static_cast<int>(float(point3.x)/float(ui->detection_img->width())*float(frame.cols));
+    y =static_cast<int>(float(point3.y)/float(ui->detection_img->height())*float(frame.rows));
 
     Point2f pot(x,y);
     for( size_t i = 0; i < faces.size(); i++ )
@@ -778,4 +782,91 @@ void MainWindow::on_pushButton_clicked()
 void MainWindow::on_Quit_clicked()
 {
     exit(EXIT_FAILURE);
+}
+
+void MainWindow::slotMouseSingleClicked(QMouseEvent *mouseEvent)
+{
+    QString text;
+    if (mouseEvent->button()==Qt::LeftButton)
+        // If the left button of mouse is pressed,...
+    {
+        text="Left button clicked! x="+QString::number(mouseEvent->pos().x())+" ,y="+QString::number(mouseEvent->pos().y());
+    }
+    else if(mouseEvent->button()==Qt::RightButton)
+        // If the right button of mouse is pressed,...
+    {
+        text="Right button clicked! x="+QString::number(mouseEvent->pos().x())+" ,y="+QString::number(mouseEvent->pos().y());
+    }
+    ui->label_2->setText(text);
+    point2 = mouseEvent->pos();
+    DisplayDetectedObj();
+}
+
+void MainWindow::slotMouseDoubleClicked(QMouseEvent *mouseEvent)
+{
+    QString text="Mouse double clicked! x="+QString::number(mouseEvent->pos().x())+" ,y="+QString::number(mouseEvent->pos().y());
+    ui->label_2->setText(text);
+}
+
+void MainWindow::slotMouseMovedWithRightClickDown(QRect rectangle)
+{
+    QString text="Drawing rectangle,...";
+    scaled=(QPixmap::fromImage(dest)).scaled(ui->detection_img->width(),ui->detection_img->height());
+    ui->label_2->setText(text);
+    QPainter paint;
+
+    paint.begin(&scaled);
+    paint.setBrush(Qt::blue);
+    paint.setPen(Qt::blue);
+    paint.setOpacity(0.4); // Between 0 and 1.
+
+    paint.drawRect(rectangle);
+    paint.end();
+
+    ui->detection_img->setPixmap(scaled);
+}
+
+void MainWindow::slotNewRectangleReceived(QRect rectangle)
+{
+    QString text="New rectangle received! x="
+            +QString::number(rectangle.x())+", y="
+            +QString::number(rectangle.y())+", Width="
+            +QString::number(rectangle.width())+", Height="
+            +QString::number(rectangle.height());
+    scaled=(QPixmap::fromImage(dest)).scaled(ui->detection_img->width(),ui->detection_img->height());
+    ui->label_2->setText(text);
+    QPainter paint;
+
+    int x,y,width, height;
+    x=static_cast<int>(float(rectangle.x())/float(ui->detection_img->width())*float(frame2.cols));
+    y=static_cast<int>(float(rectangle.y())/float(ui->detection_img->height())*float(frame2.rows));
+    width=static_cast<int>(float(rectangle.width())/float(ui->detection_img->width())*float(frame2.cols));
+    height=static_cast<int>(float(rectangle.height())/float(ui->detection_img->height())*float(frame2.rows));
+
+    Rect setectedRectangle =Rect(x,y, width, height);
+    object = frame2(setectedRectangle);
+
+    if(!object.empty()){
+            imshow("window", object);
+        }
+    waitKey(0);
+    paint.begin(&scaled);
+    paint.setBrush(Qt::green);
+    paint.setPen(Qt::green);
+    paint.setOpacity(0.4); // Between 0 and 1.
+
+    paint.drawRect(rectangle);
+    paint.end();
+
+    ui->detection_img->setPixmap(scaled);
+}
+
+void MainWindow::on_EnableCropObject_clicked()
+{
+    connect(ui->detection_img,SIGNAL(signalMouseMovedWithRightClickDown(QRect)),this,SLOT(slotMouseMovedWithRightClickDown(QRect)));
+    connect(ui->detection_img,SIGNAL(signalNewRectangle(QRect)),this,SLOT(slotNewRectangleReceived(QRect)));
+
+    disconnect(ui->detection_img,SIGNAL(signalMouseClicked(QMouseEvent*)),this,SLOT(slotMouseSingleClicked(QMouseEvent*)));
+    disconnect(ui->detection_img,SIGNAL(signalMouseDoubleClicked(QMouseEvent*)),this,SLOT(slotMouseDoubleClicked(QMouseEvent*)));
+
 }

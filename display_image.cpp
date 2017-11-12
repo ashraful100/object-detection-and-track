@@ -6,10 +6,10 @@ Display_Image::Display_Image(QWidget *parent) :
     ui(new Ui::Display_Image)
 {
     ui->setupUi(this);
+    this->setWindowTitle("Display Detected Image");
 
     ui->label->setScaledContents(true);
     ui->label->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
-
 }
 
 void Display_Image::DisplayQImage(QImage &src)

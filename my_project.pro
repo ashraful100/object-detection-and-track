@@ -31,7 +31,8 @@ SOURCES += main.cpp\
     contents.cpp \
     about.cpp \
     featuredata.cpp \
-    display_image.cpp
+    display_image.cpp \
+    myqlabel.cpp
 
 HEADERS  += mainwindow.h \
     mouse_position.h \
@@ -39,7 +40,8 @@ HEADERS  += mainwindow.h \
     contents.h \
     about.h \
     featuredata.h \
-    display_image.h
+    display_image.h \
+    myqlabel.h
 
 FORMS    += mainwindow.ui \
     objectdialog.ui \
