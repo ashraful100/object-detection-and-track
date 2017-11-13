@@ -1,4 +1,4 @@
-#include "about.h"
+#include "About.h"
 #include "ui_about.h"
 #include <QFile>
 #include<QMessageBox>

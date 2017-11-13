@@ -1,4 +1,4 @@
-#include "detectordatabase.h"
+#include "DetectorDatabase.h"
 #include "ui_detectordatabase.h"
 #include <QMessageBox>
 #include <QtSql/QSqlError>

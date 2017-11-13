@@ -1,4 +1,4 @@
-#include "contents.h"
+#include "Contents.h"
 #include "ui_contents.h"
 #include <QFile>
 #include<QMessageBox>

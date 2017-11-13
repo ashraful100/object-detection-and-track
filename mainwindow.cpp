@@ -13,10 +13,10 @@
 #include "opencv2/calib3d/calib3d.hpp"
 #include <QMessageBox>
 #include <QInputDialog>
-#include "detectordatabase.h"
+#include "DetectorDatabase.h"
 #include <QSqlError>
-#include <contents.h>
-#include <about.h>
+#include <Contents.h>
+#include <About.h>
 
 using namespace std;
 using namespace cv;

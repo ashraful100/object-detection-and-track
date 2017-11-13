@@ -27,29 +27,29 @@ DEFINES += QT_DEPRECATED_WARNINGS
 SOURCES += main.cpp\
         mainwindow.cpp \
     mouse_position.cpp \
-    detectordatabase.cpp \
-    contents.cpp \
-    about.cpp \
     featuredata.cpp \
     display_image.cpp \
-    myqlabel.cpp
+    myqlabel.cpp \
+    DetectorDatabase.cpp \
+    About.cpp \
+    Contents.cpp
 
 HEADERS  += mainwindow.h \
     mouse_position.h \
-    detectordatabase.h \
-    contents.h \
-    about.h \
     featuredata.h \
     display_image.h \
-    myqlabel.h
+    myqlabel.h \
+    DetectorDatabase.h \
+    About.h \
+    Contents.h
 
 FORMS    += mainwindow.ui \
     objectdialog.ui \
-    detectordatabase.ui \
-    contents.ui \
-    about.ui \
     featuredata.ui \
-    display_image.ui
+    display_image.ui \
+    DetectorDatabase.ui \
+    About.ui \
+    Contents.ui
 
 RESOURCES +=
 
