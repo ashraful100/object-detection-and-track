@@ -12,12 +12,14 @@ About::About(QWidget *parent) :
 
     this->setWindowTitle("About");
 
+    //Opening the About text file
     QFile file("C:/Users/ASHRAF/Documents/my_project/About.txt");
     if(!file.open(QIODevice::ReadOnly))
     {
         QMessageBox::information(0,"Info",file.errorString());
     }
     QTextStream In(&file);
+    //Setting text of About in our text browser
     ui->textBrowser->setText(In.readAll());
 }
 

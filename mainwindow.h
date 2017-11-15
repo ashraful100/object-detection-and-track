@@ -28,17 +28,17 @@ public:
     Mat object;
     explicit MainWindow(QWidget *parent = 0);   
     QSqlDatabase Database;
-    Display_Image disp;
+    Display_Image display;
     QSqlQuery *query;
-    int frameNum;int CurrentFrame;
-    VideoCapture cap;
-    Mat3b frame1,frame3, result_image;
+    int frameNumber;int CurrentFrame;
+    VideoCapture capture;
+    //Mat3b frame1,frame3, result_image;
     QImage image1, image2;
     FeatureData featureData;
     QPixmap scaled;
     QImage dest;
 
-    void FAST_corner_detection();
+    void FAST_feature_detection();
     void SIFT_feature_detection();
     void SURF_feature_detection();
     void BRIEF_feature_detection();
@@ -58,12 +58,12 @@ public:
 
     vector<Rect> faces;
     vector<Mat>collect;
-    Mat inputImg_1, inputImg_2, frame, frame2, object_detected_image;
+    Mat3b inputImg_1, inputImg_2, frame, frame2, object_detected_image, frame1,frame3, result_image;
     QImage image;
     QString getData_1,getData_2;
     QPoint point2;
     CascadeClassifier cascade;
-    std::string classifier, image_path_detect,image_path_track, video_path_track;
+    std::string classifier, detection_image_path,tracking_image_path, video_selection_path;
     ~MainWindow();
 
 private slots:

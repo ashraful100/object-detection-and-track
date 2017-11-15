@@ -28,14 +28,14 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     this->setWindowTitle("Object Detection and Tracking");
     QPixmap pix("C:/Users/ASHRAF/Desktop/X-folder/headingLogo2.png");
-    //scaled=image.scaled(ui->detection_img->width(),ui->detection_img->height());
-    ui->detection_img->setPixmap(pix);
-    ui->detection_img->setScaledContents(true);
-    ui->detection_img->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    ui->detection_image->setPixmap(pix);
+    ui->detection_image->setScaledContents(true);
+    ui->detection_image->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
-    ui->tracking_img->setScaledContents(true);
-    ui->tracking_img->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
+    ui->tracking_image->setScaledContents(true);
+    ui->tracking_image->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Ignored);
 
+    //Adding Feature Detection Techniques to QComboBox "Features"
     ui->Features->addItem("Feature Selection");
     ui->Features->addItem("FAST");
     ui->Features->addItem("SURF");
@@ -43,8 +43,11 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->Features->addItem("ORB");
     ui->Features->addItem("BRIEF");
     ui->spinBox->setEnabled(false);
+
+    //Here disabling the horizontalSlider for video play by false
     ui->horizontalSlider->setEnabled(false);
 
+    //addDetector_to_pop_up_manu() function collects Detector .xml file from Database and add the to QComboBox "Detectors"
     addDetector_to_pop_up_manu();
     connect(this, SIGNAL(sendCurrentFrame(int)),ui->spinBox,SLOT(setValue(int)));
     connect(ui->horizontalSlider, SIGNAL(valueChanged(int)), ui->spinBox, SLOT(setValue(int)));
@@ -54,6 +57,8 @@ MainWindow::MainWindow(QWidget *parent) :
 void MainWindow::addDetector_to_pop_up_manu()
 {
     ui->Detectors->addItem("Detector Selection");
+
+    //Connecting with SQLite database
     Database = QSqlDatabase::addDatabase("QSQLITE");
     Database.setDatabaseName("C:/sqlite2/DetectorList.db");
     Database.open();
@@ -62,7 +67,7 @@ void MainWindow::addDetector_to_pop_up_manu()
     query->prepare(queryString);
 
     if(!query->exec())
-    {
+    {        
         QMessageBox::critical(this,tr ("Error"),tr ("Error saving data"));
     }
     else{
@@ -104,7 +109,7 @@ void MainWindow::on_RUN_clicked()
 
     if(getData_1!="Feature Selection" && getData_2!="Detector Selection")
     {
-        if (image_path_detect.empty() && video_path_track.empty())
+        if (detection_image_path.empty() && video_selection_path.empty())
         {
             QMessageBox::warning(this, tr("Warning"),tr("Neither Image nor Video has been chosen for object detection. \n Please choose first image or video for object detection"));
         }
@@ -119,7 +124,7 @@ void MainWindow::Feature_selection()
 {        
     if(getData_1=="FAST")
     {
-        FAST_corner_detection();
+        FAST_feature_detection();
     }
     else if(getData_1=="SIFT")
     {      
@@ -187,7 +192,7 @@ void MainWindow::Classifier_Apply()
         equalizeHist( frame_gray, frame_gray );
 
         //-- Detect faces
-        cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(30, 30) );
+        cascade.detectMultiScale( frame_gray, faces, 1.1, 2, 0|CV_HAAR_SCALE_IMAGE, Size(16, 16),Size(100, 100) );
         for( size_t i = 0; i < faces.size(); i++ )
         {
             Scalar color = Scalar( rng.uniform(0, 255), rng.uniform(0,255), rng.uniform(0,255) );
@@ -198,15 +203,15 @@ void MainWindow::Classifier_Apply()
         dest=Mat3b2QImage(src);
         //QPixmap imge=QPixmap::fromImage(dest);
 
-        ui->detection_img->setPixmap(QPixmap::fromImage(dest));
-        ui->detection_img->setScaledContents(true);
-        ui->detection_img->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
+        ui->detection_image->setPixmap(QPixmap::fromImage(dest));
+        ui->detection_image->setScaledContents(true);
+        ui->detection_image->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Ignored );
 
         QPoint point;
         //connect(ui->detection_img,SIGNAL(sendMousePosition(QPoint&)),this,SLOT(showMousePosition(QPoint&)));
 
-        connect(ui->detection_img,SIGNAL(signalMouseClicked(QMouseEvent*)),this,SLOT(slotMouseSingleClicked(QMouseEvent*)));
-        connect(ui->detection_img,SIGNAL(signalMouseDoubleClicked(QMouseEvent*)),this,SLOT(slotMouseDoubleClicked(QMouseEvent*)));
+        connect(ui->detection_image,SIGNAL(signalMouseClicked(QMouseEvent*)),this,SLOT(slotMouseSingleClicked(QMouseEvent*)));
+        connect(ui->detection_image,SIGNAL(signalMouseDoubleClicked(QMouseEvent*)),this,SLOT(slotMouseDoubleClicked(QMouseEvent*)));
 
 
         imwrite("object_detected_image.jpg",frame);
@@ -215,28 +220,28 @@ void MainWindow::Classifier_Apply()
 
 void MainWindow::DisplayImages()
 {
-    if(!image_path_detect.empty())
+    if(!detection_image_path.empty())
     {
-        frame= imread(image_path_detect);
-        frame2= imread(image_path_detect);
+        frame= imread(detection_image_path);
+        frame2= imread(detection_image_path);
     }
-    if(!image_path_track.empty())
+    if(!tracking_image_path.empty())
     {
-        frame3 =imread(image_path_track);
+        frame3 =imread(tracking_image_path);
     }
 
-    if(!video_path_track.empty())
+    if(!video_selection_path.empty())
     {
-        cap.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
-        cap >> frame;
-        cap.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
-        cap >>frame2;
-        cap.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame+1);
-        cap >> frame3;        
+        capture.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
+        capture >> frame;
+        capture.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
+        capture >>frame2;
+        capture.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame+1);
+        capture >> frame3;
     }
 }
 
-void MainWindow::FAST_corner_detection()
+void MainWindow::FAST_feature_detection()
 {
     inputImg_1=object;
     Mat GrayImage_1,GrayImage_2;
@@ -254,7 +259,7 @@ void MainWindow::FAST_corner_detection()
     {
         GrayImage_1 =  inputImg_1;
     }
-    if((!image_path_track.empty()) || (!video_path_track.empty()))
+    if((!tracking_image_path.empty()) || (!video_selection_path.empty()))
     {
         inputImg_2=frame3;
         if(inputImg_2.channels() >2)
@@ -288,9 +293,9 @@ void MainWindow::FAST_corner_detection()
         drawMatches(inputImg_1, keypoints1, inputImg_2, keypoints2, matches, img_matches);
 
         QImage pass=Mat3b2QImage(img_matches);
-        disp.DisplayQImage(pass);
-        disp.setModal(true);
-        disp.exec();
+        display.DisplayQImage(pass);
+        display.setModal(true);
+        display.exec();
 
     }
     else
@@ -321,7 +326,7 @@ void MainWindow::SIFT_feature_detection()
     contrastThreshold=0.04;
     Mat inputImg,outputImg;
     inputImg = object;
-    if((!image_path_track.empty())||(!video_path_track.empty()))
+    if((!tracking_image_path.empty())||(!video_selection_path.empty()))
     {
         outputImg=frame3;
         cvtColor( outputImg, outputImg, CV_BGR2GRAY );        
@@ -373,9 +378,9 @@ void MainWindow::SIFT_feature_detection()
         drawMatches(object, inputImgKeypoints, frame3, outputImgKeypoints, matches, img_matches);
 
         QImage pass=Mat3b2QImage(img_matches);
-        disp.DisplayQImage(pass);
-        disp.setModal(true);
-        disp.exec();
+        display.DisplayQImage(pass);
+        display.setModal(true);
+        display.exec();
     }
     else
     {
@@ -475,9 +480,9 @@ void MainWindow::SURF_feature_detection()
 
     //-- Show detected matches
     QImage pass=Mat3b2QImage(img_matches);
-    disp.DisplayQImage(pass);
-    disp.setModal(true);
-    disp.exec();
+    display.DisplayQImage(pass);
+    display.setModal(true);
+    display.exec();
 
 }
 
@@ -531,9 +536,9 @@ void MainWindow::BRIEF_feature_detection()
     drawMatches(img_1, keypoints_1, img_2, keypoints_2, matches, img_matches);
 
     QImage pass=Mat3b2QImage(img_matches);
-    disp.DisplayQImage(pass);
-    disp.setModal(true);
-    disp.exec();
+    display.DisplayQImage(pass);
+    display.setModal(true);
+    display.exec();
 }
 
 void MainWindow::ORB_feature_detection()
@@ -591,9 +596,9 @@ void MainWindow::ORB_feature_detection()
     drawMatches(img_1, keypoints_1, img_2, keypoints_2, matches, img_matches);
 
     QImage pass=Mat3b2QImage(img_matches);
-    disp.DisplayQImage(pass);
-    disp.setModal(true);
-    disp.exec();
+    display.DisplayQImage(pass);
+    display.setModal(true);
+    display.exec();
 }
 
 void MainWindow::DisplayDetectedObj()
@@ -601,8 +606,8 @@ void MainWindow::DisplayDetectedObj()
     Point2f point3(point2.x(),point2.y());
     int x,y;
 
-    x =static_cast<int>(float(point3.x)/float(ui->detection_img->width())*float(frame.cols));
-    y =static_cast<int>(float(point3.y)/float(ui->detection_img->height())*float(frame.rows));
+    x =static_cast<int>(float(point3.x)/float(ui->detection_image->width())*float(frame.cols));
+    y =static_cast<int>(float(point3.y)/float(ui->detection_image->height())*float(frame.rows));
 
     Point2f pot(x,y);
     for( size_t i = 0; i < faces.size(); i++ )
@@ -625,8 +630,8 @@ void MainWindow::DisplayDetectedObj()
 
 void MainWindow::on_actionDetect_triggered()
 {
-    video_path_track.clear();
-    ui->detection_img->clear();
+    video_selection_path.clear();
+    ui->detection_image->clear();
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Images (*.png *.xpm *.jpg)"));
     dialog.setViewMode(QFileDialog::Detail);
@@ -635,8 +640,8 @@ void MainWindow::on_actionDetect_triggered()
     if(!imagefileName.isEmpty())
     {
         QImage image(imagefileName);
-        ui->detection_img->setPixmap(QPixmap::fromImage(image));
-        image_path_detect=imagefileName.toLocal8Bit().constData();
+        ui->detection_image->setPixmap(QPixmap::fromImage(image));
+        detection_image_path=imagefileName.toLocal8Bit().constData();
         ui->spinBox->setEnabled(false);
         ui->horizontalSlider->setEnabled(false);
     }
@@ -644,7 +649,7 @@ void MainWindow::on_actionDetect_triggered()
 
 void MainWindow::on_actionVideo_triggered()
 {
-    image_path_track.clear();
+    tracking_image_path.clear();
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Videos (*.avi)"));
     dialog.setViewMode(QFileDialog::Detail);
@@ -652,38 +657,38 @@ void MainWindow::on_actionVideo_triggered()
 
     if(!videofileName.isEmpty())
     {
-        video_path_track= videofileName.toLocal8Bit().constData();
-        cap=VideoCapture(video_path_track);
-        if(!cap.isOpened())
+        video_selection_path= videofileName.toLocal8Bit().constData();
+        capture=VideoCapture(video_selection_path);
+        if(!capture.isOpened())
         {
             QMessageBox::warning(this, tr("Warning"),tr("Error loadeing video."));
         }
         else
         {
-            cap >> frame;            
+            capture >> frame;
             if(frame.empty())
             {
                 QMessageBox::warning(this, tr("Warning"),tr("Video frame cannot be openned."));
             }
             else
             {
-                CurrentFrame=cap.get(CV_CAP_PROP_POS_FRAMES);
-                int TotalFrame=cap.get(CV_CAP_PROP_FRAME_COUNT);
+                CurrentFrame=capture.get(CV_CAP_PROP_POS_FRAMES);
+                int TotalFrame=capture.get(CV_CAP_PROP_FRAME_COUNT);
                 ui->spinBox->setMaximum(TotalFrame);
                 ui->horizontalSlider->setMaximum(ui->spinBox->maximum());
 
                 emit sendCurrentFrame(CurrentFrame);
 
                 image1= Mat3b2QImage(frame);
-                ui->detection_img->setPixmap(QPixmap::fromImage(image1));
+                ui->detection_image->setPixmap(QPixmap::fromImage(image1));
                 QApplication::processEvents();
 
-                cap.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame+1);
-                cap >> frame3;
+                capture.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame+1);
+                capture >> frame3;
                 image2= Mat3b2QImage(frame3);
-                ui->tracking_img->setPixmap(QPixmap::fromImage(image2));
+                ui->tracking_image->setPixmap(QPixmap::fromImage(image2));
                 QApplication::processEvents();
-                cap.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
+                capture.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
 
                 ui->spinBox->setEnabled(true);
                 ui->horizontalSlider->setEnabled(true);
@@ -693,8 +698,8 @@ void MainWindow::on_actionVideo_triggered()
 }
 void MainWindow::on_actionTrack_triggered()
 {
-    ui->tracking_img->clear();
-    video_path_track.clear();
+    ui->tracking_image->clear();
+    video_selection_path.clear();
     QFileDialog dialog(this);
     dialog.setNameFilter(tr("Images (*.png *.xpm *.jpg)"));
     dialog.setViewMode(QFileDialog::Detail);
@@ -703,8 +708,8 @@ void MainWindow::on_actionTrack_triggered()
     if(!imagefileName.isEmpty())
     {
         QImage image(imagefileName);
-        ui->tracking_img->setPixmap(QPixmap::fromImage(image));
-        image_path_track=imagefileName.toLocal8Bit().constData();
+        ui->tracking_image->setPixmap(QPixmap::fromImage(image));
+        tracking_image_path=imagefileName.toLocal8Bit().constData();
         ui->spinBox->setEnabled(false);
         ui->horizontalSlider->setEnabled(false);
     }
@@ -745,18 +750,18 @@ void MainWindow::on_detector_clicked()
 void MainWindow::on_spinBox_valueChanged(int arg1)
 {
     CurrentFrame=arg1;
-    cap.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
-    cap >> frame;    
+    capture.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
+    capture >> frame;
     image1= Mat3b2QImage(frame);
-    ui->detection_img->setPixmap(QPixmap::fromImage(image1));
+    ui->detection_image->setPixmap(QPixmap::fromImage(image1));
     QApplication::processEvents();
 
-    cap.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame+1);
-    cap >> frame3;
+    capture.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame+1);
+    capture >> frame3;
     image2= Mat3b2QImage(frame3);
-    ui->tracking_img->setPixmap(QPixmap::fromImage(image2));
+    ui->tracking_image->setPixmap(QPixmap::fromImage(image2));
     QApplication::processEvents();
-    cap.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
+    capture.set(CV_CAP_PROP_POS_FRAMES, CurrentFrame);
 }
 
 void MainWindow::on_actionContents_triggered()
@@ -811,7 +816,7 @@ void MainWindow::slotMouseDoubleClicked(QMouseEvent *mouseEvent)
 void MainWindow::slotMouseMovedWithRightClickDown(QRect rectangle)
 {
     QString text="Drawing rectangle,...";
-    scaled=(QPixmap::fromImage(dest)).scaled(ui->detection_img->width(),ui->detection_img->height());
+    scaled=(QPixmap::fromImage(dest)).scaled(ui->detection_image->width(),ui->detection_image->height());
     ui->label_2->setText(text);
     QPainter paint;
 
@@ -823,7 +828,7 @@ void MainWindow::slotMouseMovedWithRightClickDown(QRect rectangle)
     paint.drawRect(rectangle);
     paint.end();
 
-    ui->detection_img->setPixmap(scaled);
+    ui->detection_image->setPixmap(scaled);
 }
 
 void MainWindow::slotNewRectangleReceived(QRect rectangle)
@@ -833,15 +838,15 @@ void MainWindow::slotNewRectangleReceived(QRect rectangle)
             +QString::number(rectangle.y())+", Width="
             +QString::number(rectangle.width())+", Height="
             +QString::number(rectangle.height());
-    scaled=(QPixmap::fromImage(dest)).scaled(ui->detection_img->width(),ui->detection_img->height());
+    scaled=(QPixmap::fromImage(dest)).scaled(ui->detection_image->width(),ui->detection_image->height());
     ui->label_2->setText(text);
     QPainter paint;
 
     int x,y,width, height;
-    x=static_cast<int>(float(rectangle.x())/float(ui->detection_img->width())*float(frame2.cols));
-    y=static_cast<int>(float(rectangle.y())/float(ui->detection_img->height())*float(frame2.rows));
-    width=static_cast<int>(float(rectangle.width())/float(ui->detection_img->width())*float(frame2.cols));
-    height=static_cast<int>(float(rectangle.height())/float(ui->detection_img->height())*float(frame2.rows));
+    x=static_cast<int>(float(rectangle.x())/float(ui->detection_image->width())*float(frame2.cols));
+    y=static_cast<int>(float(rectangle.y())/float(ui->detection_image->height())*float(frame2.rows));
+    width=static_cast<int>(float(rectangle.width())/float(ui->detection_image->width())*float(frame2.cols));
+    height=static_cast<int>(float(rectangle.height())/float(ui->detection_image->height())*float(frame2.rows));
 
     Rect setectedRectangle =Rect(x,y, width, height);
     object = frame2(setectedRectangle);
@@ -858,16 +863,16 @@ void MainWindow::slotNewRectangleReceived(QRect rectangle)
     paint.drawRect(rectangle);
     paint.end();
 
-    ui->detection_img->setPixmap(scaled);
+    ui->detection_image->setPixmap(scaled);
 }
 
 void MainWindow::on_EnableCropObject_clicked()
 {
-    connect(ui->detection_img,SIGNAL(signalMouseMovedWithRightClickDown(QRect)),this,SLOT(slotMouseMovedWithRightClickDown(QRect)));
-    connect(ui->detection_img,SIGNAL(signalNewRectangle(QRect)),this,SLOT(slotNewRectangleReceived(QRect)));
+    connect(ui->detection_image,SIGNAL(signalMouseMovedWithRightClickDown(QRect)),this,SLOT(slotMouseMovedWithRightClickDown(QRect)));
+    connect(ui->detection_image,SIGNAL(signalNewRectangle(QRect)),this,SLOT(slotNewRectangleReceived(QRect)));
 
     //Now disconnecting other signals
-    disconnect(ui->detection_img,SIGNAL(signalMouseClicked(QMouseEvent*)),this,SLOT(slotMouseSingleClicked(QMouseEvent*)));
-    disconnect(ui->detection_img,SIGNAL(signalMouseDoubleClicked(QMouseEvent*)),this,SLOT(slotMouseDoubleClicked(QMouseEvent*)));
+    disconnect(ui->detection_image,SIGNAL(signalMouseClicked(QMouseEvent*)),this,SLOT(slotMouseSingleClicked(QMouseEvent*)));
+    disconnect(ui->detection_image,SIGNAL(signalMouseDoubleClicked(QMouseEvent*)),this,SLOT(slotMouseDoubleClicked(QMouseEvent*)));
 
 }

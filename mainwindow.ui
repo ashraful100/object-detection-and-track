@@ -17,7 +17,7 @@
    <string notr="true">background-color: rgb(125, 155, 200);</string>
   </property>
   <widget class="QWidget" name="centralWidget">
-   <widget class="MyQLabel" name="detection_img">
+   <widget class="MyQLabel" name="detection_image">
     <property name="geometry">
      <rect>
       <x>20</x>
@@ -61,7 +61,7 @@
      <string>RUN</string>
     </property>
    </widget>
-   <widget class="QLabel" name="tracking_img">
+   <widget class="QLabel" name="tracking_image">
     <property name="geometry">
      <rect>
       <x>530</x>
@@ -275,9 +275,9 @@ Feature Parameter</string>
      <string>Enable Crop Object</string>
     </property>
    </widget>
-   <zorder>detection_img</zorder>
+   <zorder>detection_image</zorder>
    <zorder>RUN</zorder>
-   <zorder>tracking_img</zorder>
+   <zorder>tracking_image</zorder>
    <zorder>textEdit</zorder>
    <zorder>textEdit_2</zorder>
    <zorder>spinBox</zorder>
